@@ -5,7 +5,8 @@
 ### Diagrama Estructural Relacional
  
 *(Incrustar aquí el diagrama EER/relacional actualizado — imagen o bloque Mermaid — antes de la entrega final.)*
-![Diagrama relacional de EcoPoint Edu](Esquema Relacional/ER EcoPoint.png)
+
+<img src="Esquema Relacional/ER EcoPoint.png" alt="Diagrama relacional de EcoPoint Edu" width="700">
 
  
 ##  Políticas de Borrado (Integridad Referencial)
