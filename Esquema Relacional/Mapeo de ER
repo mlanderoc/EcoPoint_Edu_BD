@@ -1,133 +1,132 @@
-### Esquema Relacional
-
-```mermaid
 erDiagram
-    INSTITUCION {
-        int id_institucion PK
-        string nombre
-        string direccion
-    }
+      INSTITUCION {
+          int id_institucion PK
+          string nombre UK
+          string direccion
+          string ruta_plano
+      }
 
-    ZONA {
-        int id_zona PK
-        int id_institucion FK
-        string nombre
-        string descripcion
-    }
+      ZONA {
+          int id_zona PK
+          int id_institucion FK, UK
+          string nombre UK
+          string descripcion
+      }
+      PUNTO_ECOLOGICO {
+          int id_punto PK
+          int id_zona FK
+          string codigo UK
+          string ubicacion
+          string estado
+          decimal coord_x
+          decimal coord_y
+          string observaciones
+      }
 
-    PUNTO_ECOLOGICO {
-        int id_punto PK
-        int id_zona FK
-        string estado
-        string observaciones
-        string ubicacion
-        string estado_inicial
-        decimal coord_x
-        decimal coord_y
-    }
+      RECIPIENTE {
+          int id_punto PK, FK
+          int id_recipiente PK
+          string color
+          decimal capacidad
+      }
 
-    RECIPIENTE {
-        int id_punto PK, FK
-        int id_recipiente PK
-        string tipo_residuo
-        string color
-        decimal capacidad
-    }
+      USUARIO {
+          int id_usuario PK
+          string nombre
+          string apellido
+          string correo UK
+          string password_hash
+          string rol
+          boolean activo
+      }
 
-    USUARIO {
-        int id_usuario PK
-        string nombre
-        string apellido
-        string correo
-        string rol
-    }
+      JORNADA {
+          int id_jornada PK
+          int id_institucion FK, UK
+          date fecha UK
+          string observaciones
+      }
 
-    JORNADA {
-        int id_jornada PK
-        date fecha
-        string observaciones
-    }
+      DETALLE_JORNADA {
+          int id_registro_jornada PK
+          int id_jornada FK, UK
+          int id_punto FK, UK
+          int id_usuario FK
+          datetime fecha_hora_captura
+          string estado_punto
+          string observaciones
+      }
 
-    DETALLE_JORNADA {
-        int id_registro_jornada PK
-        int id_jornada FK
-        int id_punto FK
-        int id_usuario FK
-        date fecha_captura
-        string estado_punto
-        string observaciones
-    }
+      DETALLE_RECIPIENTE {
+          int id_detalle_recipiente PK
+          int id_registro_jornada FK, UK
+          int id_punto FK
+          int id_recipiente FK, UK
+          string nivel_llenado
+          string estado_recipiente
+          string estado_senalizacion
+          boolean mala_separacion
+          string observaciones
+      }
 
-    DETALLE_RECIPIENTE {
-        int id_detalle_recipiente PK
-        int id_registro_jornada FK
-        int id_punto FK
-        int id_recipiente FK
-        string nivel_llenado
-        string estado_recipiente
-        string estado_senalizacion
-        boolean mala_separacion
-        string observaciones
-    }
+      ALERTA {
+          int id_alerta PK
+          int id_detalle_recipiente FK
+          string tipo
+          string nivel_criticidad
+          boolean atendida
+          string descripcion
+          datetime fecha_generada
+      }
 
-    ALERTA {
-        int id_alerta PK
-        int id_detalle_recipiente FK
-        string tipo
-        boolean atendida
-        string descripcion
-        datetime fecha_generada
-    }
+      EVIDENCIA {
+          int id_evidencia PK
+          int id_registro_jornada FK
+          string ruta_archivo
+          string descripcion
+          datetime fecha_carga
+      }
 
-    EVIDENCIA {
-        int id_evidencia PK
-        int id_registro_jornada FK
-        string ruta_archivo
-        string descripcion
-        datetime fecha_carga
-    }
+      CUARTEO {
+          int id_cuarteo PK
+          int id_registro_jornada FK, UK
+          decimal peso_inicial
+          decimal peso_muestra
+          string observaciones
+      }
 
-    CUARTEO {
-        int id_cuarteo PK
-        int id_registro_jornada FK
-        decimal peso_inicial
-        decimal peso_muestra
-        string observaciones
-    }
+      RESIDUO {
+          int id_residuo PK
+          string nombre UK
+          string descripcion
+          string color_asociado
+      }
 
-    RESIDUO {
-        int id_residuo PK
-        string nombre
-        string descripcion
-        string color_asociado
-    }
+      RESULTADO_CUARTEO {
+          int id_cuarteo PK, FK
+          int id_residuo PK, FK
+          decimal peso
+          int cantidad
+      }
 
-    RESULTADO_CUARTEO {
-        int id_cuarteo PK, FK
-        int id_resultado PK
-        int id_residuo FK
-        decimal peso
-        int cantidad
-        decimal porcentaje
-    }
+      %% Relaciones estructurales
+      INSTITUCION ||--o{ ZONA : "tiene"
+      INSTITUCION ||--o{ JORNADA : "programa"
+      ZONA ||--o{ PUNTO_ECOLOGICO : "contiene"
+      PUNTO_ECOLOGICO ||--|{ RECIPIENTE : "posee (3)"
 
-    %% Relaciones estructurales
-    INSTITUCION ||--o{ ZONA : "tiene"
-    ZONA ||--o{ PUNTO_ECOLOGICO : "contiene"
-    PUNTO_ECOLOGICO ||--|{ RECIPIENTE : "posee (3)"
-    
-    %% Relaciones operativas y de inspeccion
-    JORNADA ||--o{ DETALLE_JORNADA : "incluye"
-    PUNTO_ECOLOGICO ||--o{ DETALLE_JORNADA : "es-visitado-en"
-    USUARIO ||--o{ DETALLE_JORNADA : "captura"
-    
-    %% Detalle por recipiente e incidencias
-    DETALLE_JORNADA ||--|{ DETALLE_RECIPIENTE : "detalla (3)"
-    RECIPIENTE ||--o{ DETALLE_RECIPIENTE : "registrado_en"
-    DETALLE_RECIPIENTE ||--o{ ALERTA : "genera"
-    
-    %% Trazabilidad y pesaje
-    DETALLE_JORNADA ||--o{ EVIDENCIA : "tiene"
-    DETALLE_JORNADA ||--o| CUARTEO : "origina"
-    CUARTEO ||--|{ RESULTADO_CUARTEO : "produce"
-    RESIDUO ||--o{ RESULTADO_CUARTEO : "clasifica"
+      %% Relaciones operativas y de inspeccion
+      JORNADA ||--o{ DETALLE_JORNADA : "incluye"
+      PUNTO_ECOLOGICO ||--o{ DETALLE_JORNADA : "es-visitado-en"
+      USUARIO ||--o{ DETALLE_JORNADA : "captura"
+
+      %% Detalle por recipiente e incidencias
+      DETALLE_JORNADA ||--|{ DETALLE_RECIPIENTE : "detalla (3)"
+      RECIPIENTE ||--o{ DETALLE_RECIPIENTE : "registrado_en"
+      DETALLE_RECIPIENTE ||--o{ ALERTA : "genera"
+
+      %% Trazabilidad y pesaje
+      DETALLE_JORNADA ||--o{ EVIDENCIA : "tiene"
+      DETALLE_JORNADA ||--o| CUARTEO : "origina"
+      CUARTEO ||--|{ RESULTADO_CUARTEO : "produce"
+      RESIDUO ||--o{ RESULTADO_CUARTEO : "clasifica"
